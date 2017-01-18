@@ -1,17 +1,16 @@
 # django-apache-conf
-Script que cria o arquivo ".conf" da sua aplicação Django para ser colocado na configuração do Apache.
+Script que cria o arquivo de configuração do VirtualHost (arquivo ".conf") da sua aplicação Django para ser colocado no diretório de configuração do Apache.
 
 Eu não sei se já existe alguma ferramenta que faz isso, se existir eu acredito que ela será mais robusta do que essa minha. Eu fiz 
 esse script pra atender uma necessidade minha, talvez você precise adaptá-lo a sua necessidade se quiser usar também.
 
-##Motivo para criá-lo
+## Motivo para criá-lo
 
 Eu li esse [post do Guilherme Louro] (http://pythonclub.com.br/configurando-ambiente-django-com-apache-e-mod-wsgi.html) sobre 
 como fazer deploy de aplicações django no Apache, testei e funciona muito bem. A parte chata era ter que ficar criando o arquivo
-".conf" do Apache na mão, as vezes eu cometia algum erro de digitação e ficava dando erro. Pra resolver isso eu fiz esse script
-bem simples para gerar o arquivo pra mim.
+de configuração do VirtualHost do Apache na mão, as vezes eu cometia algum erro de digitação e ficava dando erro. Pra resolver isso eu fiz esse script bem simples para gerar o arquivo pra mim.
 
-##Importante
+## Importante
 
 Para que esse script funcione é preciso observar algumas condições:
 
@@ -22,8 +21,7 @@ Para que esse script funcione é preciso observar algumas condições:
   
 ## Como funciona
 
-Você deve colocar esse script no diretório do seu projeto Django e executá-lo passando como parâmentro a URL que deseja usar para 
-acessar o projeto.
+Você deve colocar esse script no diretório raiz do seu projeto Django (o mesmo onde est o arquivo **manage.py**) e executá-lo passando como parâmentro a URL que deseja usar para acessar o projeto.
 
 Exemplo:
 
@@ -31,8 +29,10 @@ Exemplo:
 python make_apache_conf.py teste.marti.com.br
 ```
 
-Fazendo isso o script criará no próprio diretório o arquivo ".conf" que você deve copiar para o diretório do apache:
-`/etc/apache2/sites-available/`.
+Fazendo isso o script criará no próprio diretório o arquivo ".conf" que você deve copiar para o diretório de configuração do apache:
+
+`/etc/apache2/sites-availables/`.
+
 O nome do arquivo ".conf" criado ficará `<nome do projeto>.conf`.
 
 Se eu estivesse trabalhando no projeto chamado `meu_projeto_django` e executasse esse script no seu diretório dessa forma:
@@ -44,12 +44,8 @@ python make_apache_conf.py teste.marti.com.br
 O resultado seria a criação do arquivo `meu_projeto_django.conf` com o conteúdo abaixo:
 
 ```
-WSGIDaemonProcess teste.marti.com.br python-path=/home/henrique/www/meu_projeto_django:/home/henrique/.env/meu_projeto_django/lib/python2.7/site-packages
-WSGIProcessGroup teste.marti.com.br
-
 <VirtualHost *:80>
 	ServerName teste.marti.com.br
-	WSGIScriptAlias / /home/henrique/www/meu_projeto_django/meu_projeto_django/wsgi.py
 
 	<Directory /home/henrique/www/meu_projeto_django>
 		<Files wsgi.py>
@@ -73,6 +69,10 @@ WSGIProcessGroup teste.marti.com.br
 		Order allow,deny
 		Allow from all
 	</Directory>
+
+	WSGIDaemonProcess teste.marti.com.br python-path=/home/henrique/www/meu_projeto_django:/home/henrique/.env/meu_projeto_django/lib/python2.7/site-packages
+	WSGIProcessGroup teste.marti.com.br
+	WSGIScriptAlias / /home/henrique/www/meu_projeto_django/meu_projeto_django/wsgi.py
 
 </VirtualHost>
 ```
