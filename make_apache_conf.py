@@ -4,7 +4,7 @@ import os, sys
 def get_url():
 	if len(sys.argv) != 2:
 		raise Exception('URL não informada')
-	
+
 	return sys.argv[1]
 
 def get_project_name():
@@ -45,13 +45,9 @@ def create_file(url, project_name, project_path, environment_path):
 	wsgi_path = get_wsgi_path()
 
 	file = open(file_name, 'w')
-	
-	file.write('WSGIDaemonProcess {} python-path={}:{}/lib/python2.7/site-packages\n'.format(url, project_path, environment_path))
-	file.write('WSGIProcessGroup {}\n\n'.format(url))
 
 	file.write('<VirtualHost *:80>\n')
 	file.write('\tServerName {}\n'.format(url))
-	file.write('\tWSGIScriptAlias / {}/{}/wsgi.py\n\n'.format(project_path, wsgi_path))
 
 	file.write('\t<Directory {}>\n'.format(project_path))
 	file.write('\t\t<Files wsgi.py>\n')
@@ -75,6 +71,11 @@ def create_file(url, project_name, project_path, environment_path):
 	file.write('\t\tOrder allow,deny\n')
 	file.write('\t\tAllow from all\n')
 	file.write('\t</Directory>\n\n')
+
+	file.write('\tWSGIDaemonProcess {} python-path={}:{}/lib/python2.7/site-packages\n'.format(url, project_path, environment_path))
+	file.write('\tWSGIProcessGroup {}\n\n'.format(url))
+	file.write('\tWSGIScriptAlias / {}/{}/wsgi.py\n\n'.format(project_path, wsgi_path))
+
 	file.write('</VirtualHost>')
 	file.close()
 
